@@ -1,3 +1,6 @@
 [submodule "packages/m-explore-ros2"]
 	path = packages/m-explore-ros2
 	url = https://github.com/robo-friends/m-explore-ros2
+[submodule "firmware/stretch_firmware"]
+	path = firmware/stretch_firmware
+	url = https://github.com/New-Wheat/stretch_firmware
