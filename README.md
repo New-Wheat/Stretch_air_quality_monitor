@@ -210,44 +210,44 @@ graph TD
 
     %% 硬件层
     subgraph Hardware Layer
-        S1[DHT11 & SGP30] -->|I2C / 1-Wire| MCU[Arduino Nano]
-        MCU -->|USB Serial| NUC[Stretch 3 NUC]
+        S1["DHT11 & SGP30"] -->|"I2C / 1-Wire"| MCU["Arduino Nano"]
+        MCU -->|"USB Serial"| NUC["Stretch 3 NUC"]
     end
     class S1,MCU,NUC hardware;
 
     %% ROS 2 层
     subgraph ROS 2 Ecosystem
-        UDP[udp_processor Node]
-        MONITOR[monitor Node (Mission Commander)]
-        NAV[Nav2 / Stretch Driver]
+        UDP["udp_processor Node"]
+        MONITOR["monitor Node (Mission Commander)"]
+        NAV["Nav2 / Stretch Driver"]
         
         %% 话题与动作
-        MSG_AQ((/wrist/air_quality))
-        ACT_NAV{{goToPose Action}}
-        ACT_ARM{{follow_joint_trajectory}}
+        MSG_AQ(("/wrist/air_quality"))
+        ACT_NAV{{"goToPose Action"}}
+        ACT_ARM{{"follow_joint_trajectory"}}
 
         %% 连接关系
         NUC --> UDP
-        UDP -->|Publish| MSG_AQ
-        MSG_AQ -->|Subscribe| MONITOR
+        UDP -->|"Publish"| MSG_AQ
+        MSG_AQ -->|"Subscribe"| MONITOR
 
-        MONITOR -->|Send Goal| ACT_NAV
+        MONITOR -->|"Send Goal"| ACT_NAV
         ACT_NAV <--> NAV
         
-        MONITOR -->|Send Goal| ACT_ARM
+        MONITOR -->|"Send Goal"| ACT_ARM
         ACT_ARM <--> NAV
-
-        MONITOR -->|Publish| MSG_SPK
     end
     
-    class MSG_AQ,MSG_SPK topic;
+    %% 应用样式
+    class UDP,MONITOR,NAV rosnode;
+    class MSG_AQ topic;
     class ACT_NAV,ACT_ARM action;
 
     %% 输出层
     subgraph Output
-        HEATMAP[空气质量热力图]
+        HEATMAP["空气质量热力图"]
         
-        MONITOR -->|收集位姿与平均数据| HEATMAP
+        MONITOR -->|"收集位姿与平均数据"| HEATMAP
     end
 ```
 
