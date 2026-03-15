@@ -198,57 +198,67 @@ ros2 launch air_quality_monitor monitor.launch.py map:=<map_path>/maps/<map_name
 * **计算平台**：Hello Robot Stretch 3 内部的 Intel NUC 主机。
 
 ### 2. ROS 2 节点通信图
-以下是系统运行时的核心 Node 与 Topic/Action 交互拓扑：
+以下是系统运行时的核心节点与 Topic/Action 交互拓扑关系：
 
 ```mermaid
 graph TD
-    %% 定义样式
-    classDef hardware fill:#e1f5fe,stroke:#333,stroke-width:2px;
-    classDef rosnode fill:#e8f5e9,stroke:#0277bd,stroke-width:2px;
-    classDef topic fill:#fff3e0,stroke:#388e3c,stroke-width:1px,stroke-dasharray: 5 5;
-    classDef action fill:#fce4ec,stroke:#ef6c00,stroke-width:1px;
+    classDef app fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000;
+    classDef out fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000;
+    classDef nav fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#000;
+    classDef driver fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000;
+    classDef hw fill:#f5f5f5,stroke:#757575,stroke-width:2px,color:#000;
+    classDef kernel fill:#ede7f6,stroke:#5e35b1,stroke-width:2px,color:#000;
 
-    %% 硬件层
-    subgraph Hardware Layer
-        S1["DHT11 & SGP30"] -->|"I2C / 1-Wire"| MCU["Arduino Nano"]
-        MCU -->|"USB Serial"| NUC["Stretch 3 NUC"]
-    end
-    class S1,MCU,NUC hardware;
+    G["空气质量热力图"]
 
-    %% ROS 2 层
-    subgraph ROS 2 Ecosystem
-        UDP["udp_processor Node"]
-        MONITOR["monitor Node (Mission Commander)"]
-        NAV["Nav2 / Stretch Driver"]
+    subgraph ROS2["ROS 2"]
         
-        %% 话题与动作
-        MSG_AQ(("/wrist/air_quality"))
-        ACT_NAV{{"goToPose Action"}}
-        ACT_ARM{{"follow_joint_trajectory"}}
+        subgraph Layer1["任务决策"]
+            F["air_quality_monitor"]
+        end
 
-        %% 连接关系
-        NUC --> UDP
-        UDP -->|"Publish"| MSG_AQ
-        MSG_AQ -->|"Subscribe"| MONITOR
+        subgraph Layer2["硬件采集"]
+            H["stretch_wacc_sensor"]
+        end
 
-        MONITOR -->|"Send Goal"| ACT_NAV
-        ACT_NAV <--> NAV
-        
-        MONITOR -->|"Send Goal"| ACT_ARM
-        ACT_ARM <--> NAV
+        subgraph Layer3["核心控制"]
+            E["stretch_nav2"]
+            D["stretch_core"]
+        end
+
     end
-    
-    %% 应用样式
-    class UDP,MONITOR,NAV rosnode;
-    class MSG_AQ topic;
-    class ACT_NAV,ACT_ARM action;
 
-    %% 输出层
-    subgraph Output
-        HEATMAP["空气质量热力图"]
-        
-        MONITOR -->|"收集位姿与平均数据"| HEATMAP
+    subgraph Kernel["Linux 内核"]
+        K["内核子系统"]
     end
+
+    subgraph Hardware["物理硬件"]
+        A("机械臂")
+        B("底盘")
+        C("传感器")
+    end
+
+    F -->|"goToPose()"| E
+    F -->|"Action:<br>/stretch_controller/follow_joint_trajectory"| D
+    F -->|"记录坐标与空气质量"| G
+
+    E <-->|"Topic:<br>cmd_vel / odom / tf"| D
+    D -->|"UDP广播<br>localhost:9222"| H
+
+    E -->|"feedback<br>Topic:<br>/amcl_pose"| F
+    H -->|"Topic:<br>/wacc/air_quality"| F
+
+    D <--> K
+    K <--> A
+    K <--> B
+    K <--> C
+
+    class F app;
+    class G out;
+    class E nav;
+    class D,H driver;
+    class A,B,C hw;
+    class K kernel;
 ```
 
 ### 3. 核心数据流说明
