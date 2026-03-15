@@ -49,8 +49,7 @@ class Monitor(Node):
     def __init__(self):
         super().__init__("air_quality_monitor")
 
-        self.declare_parameter("map_yaml", "")
-        self.declare_parameter("map_pgm", "")
+        self.declare_parameter("map", "")
         self.declare_parameter("heatmap_type", 3)
 
         self.declare_parameter("settle_time", 3.0)
@@ -91,9 +90,9 @@ class Monitor(Node):
         )
 
     def _read_param(self) -> None:
-        yaml_path = self.get_parameter("map_yaml").get_parameter_value().string_value
+        yaml_path = self.get_parameter("map").get_parameter_value().string_value
         if not yaml_path:
-            raise ValueError("map_yaml parameter is empty")
+            raise ValueError("'map' parameter is empty")
 
         heatmap_type = self.get_parameter("heatmap_type").get_parameter_value().integer_value
         if heatmap_type not in range(4):
@@ -104,13 +103,11 @@ class Monitor(Node):
         with open(yaml_path, "r", encoding="utf-8") as f:
             config = yaml.safe_load(f)
 
-        pgm_path = self.get_parameter("map_pgm").get_parameter_value().string_value
-        if not pgm_path:
-            pgm_filename = config.get("image")
-            if not pgm_filename:
-                raise ValueError("map_pgm empty and image field missing in yaml")
-            yaml_dir = os.path.dirname(os.path.abspath(yaml_path))
-            pgm_path = os.path.join(yaml_dir, pgm_filename)
+        pgm_filename = config.get("image")
+        if not pgm_filename:
+            raise ValueError("'image' field missing in yaml")
+        yaml_dir = os.path.dirname(os.path.abspath(yaml_path))
+        pgm_path = os.path.join(yaml_dir, pgm_filename)
 
         map_img = cv2.imread(pgm_path, cv2.IMREAD_GRAYSCALE)
         if map_img is None:

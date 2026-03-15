@@ -70,7 +70,7 @@ def generate_launch_description():
         output="screen",
         parameters=[
             {
-                "map_yaml": LaunchConfiguration("map"),
+                "map": LaunchConfiguration("map"),
                 "heatmap_type": LaunchConfiguration("heatmap_type"),
                 "settle_time": LaunchConfiguration("settle_time"),
                 "sample_period_sec": LaunchConfiguration("sample_period_sec"),

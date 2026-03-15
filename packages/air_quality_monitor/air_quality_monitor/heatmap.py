@@ -53,28 +53,6 @@ class Heatmap:
             return None
         return self.map > 250
 
-    def _display_kernel(self) -> np.ndarray:
-        margin = max(1, int(np.ceil(ROBOT_RADIUS / self.planner.resolution)))
-        kernel_size = margin * 2 + 1
-        return cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_size, kernel_size))
-
-    def _display_mask_and_base(self) -> tuple[np.ndarray, np.ndarray] | tuple[None, None]:
-        if self.map is None:
-            return None, None
-
-        display_mask = (self.map > 250).astype(np.uint8) * 255
-        display_mask = cv2.dilate(display_mask, self._display_kernel(), iterations=1)
-
-        if self.base_map is not None:
-            raw_free_mask = (self.base_map > 250).astype(np.uint8) * 255
-            display_mask = cv2.bitwise_and(display_mask, raw_free_mask)
-            display_base = np.zeros_like(self.base_map)
-            display_base[display_mask > 0] = self.base_map[display_mask > 0]
-        else:
-            display_base = display_mask.copy()
-
-        return display_mask, display_base
-
     def _world_points_to_pixels(self, points: list[tuple[float, float]]) -> np.ndarray:
         return np.array(
             [self.planner._world_to_pixel(pos[0], pos[1]) for pos in points],
@@ -317,6 +295,28 @@ class Heatmap:
                         improved = True
         return full[1:]
 
+    def _display_kernel(self) -> np.ndarray:
+        margin = max(1, int(np.ceil(ROBOT_RADIUS / self.planner.resolution)))
+        kernel_size = margin * 2 + 1
+        return cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_size, kernel_size))
+
+    def _display_mask_and_base(self) -> tuple[np.ndarray, np.ndarray] | tuple[None, None]:
+        if self.map is None:
+            return None, None
+
+        display_mask = (self.map > 250).astype(np.uint8) * 255
+        display_mask = cv2.dilate(display_mask, self._display_kernel(), iterations=1)
+
+        if self.base_map is not None:
+            raw_free_mask = (self.base_map > 250).astype(np.uint8) * 255
+            display_mask = cv2.bitwise_and(display_mask, raw_free_mask)
+            display_base = np.zeros_like(self.base_map)
+            display_base[display_mask > 0] = self.base_map[display_mask > 0]
+        else:
+            display_base = display_mask.copy()
+
+        return display_mask, display_base
+
     def render_heatmap(self) -> None:
         if not self.data:
             self.parent.get_logger().error("data is empty, heatmap rendering failed")
@@ -347,11 +347,6 @@ class Heatmap:
             clipped = np.clip((scalar_map - low) / (high - low), 0.0, 1.0)
             normalized[mask > 0] = (clipped[mask > 0] * 255).astype(np.uint8)
 
-        safe_heat_layer = cv2.applyColorMap(normalized, cv2.COLORMAP_JET)
-        safe_heat_layer = cv2.bitwise_and(safe_heat_layer, safe_heat_layer, mask=mask)
-        safe_base_bgr = cv2.cvtColor(self.map, cv2.COLOR_GRAY2BGR)
-        safe_result = cv2.addWeighted(safe_base_bgr, 0.6, safe_heat_layer, 0.4, 0)
-
         display_mask, display_base = self._display_mask_and_base()
         if display_mask is None or display_base is None:
             self.parent.get_logger().error("display base generation failed")
@@ -365,8 +360,5 @@ class Heatmap:
         map_bgr = cv2.cvtColor(display_base, cv2.COLOR_GRAY2BGR)
         result = cv2.addWeighted(map_bgr, 0.6, heat_layer, 0.4, 0)
 
-        cv2.imwrite("heatmap_result_safe.png", safe_result)
-        self.parent.get_logger().info("safe-map heatmap saved to heatmap_result_safe.png")
         cv2.imwrite("heatmap_result.png", result)
-        cv2.imwrite("heatmap_result_display.png", result)
-        self.parent.get_logger().info("expanded heatmap saved to heatmap_result.png and heatmap_result_display.png")
+        self.parent.get_logger().info("heatmap saved to heatmap_result.png")
