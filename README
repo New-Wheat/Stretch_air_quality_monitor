@@ -52,9 +52,9 @@
 终端执行以下命令：
 
 ```bash
-git clone --recurse-submodules https://github.com/New-Wheat/air_quality_monitor
+git clone --recurse-submodules https://github.com/New-Wheat/Stretch_air_quality_monitor
 
-cd ./air_quality_monitor
+cd ./Strehch_air_quality_monitor
 ```
 
 ### 3. 传感器支持
@@ -78,7 +78,7 @@ echo 'export PYTHONPATH="${PYTHONPATH}:${HELLO_FLEET_PATH}/${HELLO_FLEET_ID}"' >
 source ~/.bashrc
 ```
 
-按照仓库中的 [stretch_user_params.yaml](https://github.com/New-Wheat/air_quality_monitor/tree/master/firmware/stretch_user_params.yaml) 修改 ${HELLO_FLEET_PATH}/${HELLO_FLEET_ID}/stretch_user_params.yaml ，样例如下：
+按照仓库中的 [stretch_user_params.yaml](https://github.com/New-Wheat/Stretch_air_quality_monitor/tree/master/firmware/stretch_user_params.yaml) 修改 ${HELLO_FLEET_PATH}/${HELLO_FLEET_ID}/stretch_user_params.yaml ，样例如下：
 
 ```yaml
 robot:
