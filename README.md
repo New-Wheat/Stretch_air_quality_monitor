@@ -204,8 +204,8 @@ ros2 launch air_quality_monitor monitor.launch.py map:=<map_path>/maps/<map_name
 graph TD
     classDef app fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000;
     classDef out fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000;
-    classDef nav fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#000;
-    classDef driver fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000;
+    classDef cap fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#000;
+    classDef core fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000;
     classDef hw fill:#f5f5f5,stroke:#757575,stroke-width:2px,color:#000;
     classDef kernel fill:#ede7f6,stroke:#5e35b1,stroke-width:2px,color:#000;
 
@@ -255,8 +255,8 @@ graph TD
 
     class F app;
     class G out;
-    class E nav;
-    class D,H driver;
+    class H cap;
+    class D,E core;
     class A,B,C hw;
     class K kernel;
 ```
