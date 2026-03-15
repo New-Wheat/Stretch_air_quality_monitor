@@ -3,7 +3,7 @@
 <!-- Badges -->
 [![ROS 2](https://img.shields.io/badge/ROS_2-Humble-blue.svg)](https://docs.ros.org/en/humble/)
 [![Python](https://img.shields.io/badge/Python-3.10-blue.svg)]()
-[![License: BSD](https://img.shields.io/badge/License-BSD-yellow.svg)](https://opensource.org/licenses/BSD)
+[![License: BSD-2](https://img.shields.io/badge/License-BSD-yellow.svg)](https://opensource.org/licenses/bsd-2-clause)
 
 > **简介**：该项目基于 ROS 2 和 Hello Robot Stretch 3 ，利用扩展的 DHT11 和 SGP30 传感器实现了一个轻量级全自动室内环境（温湿度、TVOC、eCO2）巡检与热力图生成系统。
 
