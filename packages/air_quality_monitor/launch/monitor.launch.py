@@ -63,6 +63,13 @@ def generate_launch_description():
         }.items(),
     )
 
+    wacc_sensor_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [get_package_share_directory("stretch_wacc_sensor"), "/launch/wacc_sensor.launch.py"]
+        ),
+        launch_arguments={}.items(),
+    )
+
     monitor_node = Node(
         package="air_quality_monitor",
         executable="monitor",
@@ -122,6 +129,7 @@ def generate_launch_description():
             declare_auto_tune_idw_power,
             declare_idw_power_candidates,
             stretch_nav_launch,
+            wacc_sensor_launch,
             monitor_node,
         ]
     )
